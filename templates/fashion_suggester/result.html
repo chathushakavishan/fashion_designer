@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <!-- Add your CSS and JavaScript links here -->
+</head>
+<body>
+    <h1>Fashion Type Prediction</h1>
+    <p><strong>Comfort Level:</strong> {{ data.comfort_level }}</p>
+    <p><strong>Fit Sizing Level:</strong> {{ data.fit_sizing_level }}</p>
+    <p><strong>Preferred Piece:</strong> {{ data.preferred_piece }}</p>
+    <p><strong>Design Style:</strong> {{ data.design_style }}</p>
+    <p><strong>Material Quality:</strong> {{ data.material_quality }}</p>
+    <p><strong>Predicted Fashion Type:</strong> {{ prediction }}</p>
+
+    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+</body>
+</html>

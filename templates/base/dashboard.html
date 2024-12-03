@@ -1,0 +1,146 @@
+{% extends "../base/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<!-- Main Content Section -->
+<section class="main-content py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-3 mb-4">Welcome to Your Dashboard</h1>
+                <p class="lead mb-5">Select an option to begin:</p>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm border-0 rounded-lg">
+                            <div class="card-body text-center">
+                                <i class="fas fa-store fa-4x text-primary mb-3"></i>
+                                <h4 class="card-title mb-3">Store</h4>
+                                <p class="card-text">Manage and browse your store items efficiently.</p>
+                                <a href="{% url 'store' %}" class="btn btn-primary">Go to Store</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm border-0 rounded-lg">
+                            <div class="card-body text-center">
+                                <i class="fas fa-lightbulb fa-4x text-secondary mb-3"></i>
+                                <h4 class="card-title mb-3">Fashion Suggestor</h4>
+                                <p class="card-text">Get fashion suggestions based on your preferences.</p>
+                                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#feedbackModal">Get Suggestions</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm border-0 rounded-lg">
+                            <div class="card-body text-center">
+                                <i class="fas fa-cogs fa-4x text-success mb-3"></i>
+                                <h4 class="card-title mb-3">Fashion Designing</h4>
+                                <p class="card-text">Design and customize your fashion creations.</p>
+                                <a href="#" class="btn btn-success">Start Designing</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-lg shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title" id="feedbackModalLabel">We Value Your Feedback</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="feedbackForm" method="POST" action="{% url 'feedback-suggestion' %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Result Modal -->
+<div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-lg shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resultModalLabel">Your Fashion Suggestion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="resultMessage" class="lead">Your fashion suggestion will appear here.</p>
+            </div>
+            <div class="modal-footer">
+                <a id="goToProducts" href="#" class="btn btn-primary">Go to Products</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Bootstrap JS (required for modal functionality) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+<script>
+    // Example JavaScript to handle showing result modal after form submission
+    document.getElementById('feedbackForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        // Simulate AJAX request
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Set the result message
+            document.getElementById('resultMessage').textContent = 'Your fashion suggestion is: ' + data.prediction;
+            
+            // Dynamically set the "Go to Products" button link
+            var category = encodeURIComponent(data.prediction);
+            var gender = 'All'; // Or dynamically set based on your needs
+            var goToProductsLink = `/store/?category=${category}&gender=${gender}`;
+            document.getElementById('goToProducts').href = goToProductsLink;
+
+            // Show the result modal and hide the feedback modal
+            var feedbackModal = bootstrap.Modal.getInstance(document.getElementById('feedbackModal'));
+            feedbackModal.hide();
+            
+            var resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+            resultModal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    // Ensure that the backdrop is removed after modal is hidden
+    document.addEventListener('hidden.bs.modal', function (event) {
+        if (event.target.id === 'feedbackModal' || event.target.id === 'resultModal') {
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+        }
+    });
+
+    // Handle modal reset
+    document.getElementById('feedbackModal').addEventListener('hidden.bs.modal', function () {
+        var feedbackForm = document.getElementById('feedbackForm');
+        feedbackForm.reset(); // Reset form fields if necessary
+    });
+
+    document.getElementById('resultModal').addEventListener('hidden.bs.modal', function () {
+        var goToProductsLink = document.getElementById('goToProducts');
+        goToProductsLink.href = '#'; // Reset link to avoid unintended navigation
+    });
+</script>
+{% endblock %}

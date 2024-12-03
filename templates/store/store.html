@@ -1,0 +1,52 @@
+{% extends "../base/base.html" %}
+{% load static %}
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/store.css' %}">
+</head>
+<body>
+<div class="container">
+    <div class="filters">
+        <h3>Filters</h3>
+        <div>
+            <a href="?category=All&gender={{ selected_gender }}" class="btn btn-primary filter-btn">All Categories</a>
+            {% for category in categories %}
+                <a href="?category={{ category }}&gender={{ selected_gender }}" class="btn btn-primary filter-btn">{{ category }}</a>
+            {% endfor %}
+        </div>
+        <div>
+            <a href="?category={{ selected_category }}&gender=All" class="btn btn-secondary filter-btn">All Genders</a>
+            <a href="?category={{ selected_category }}&gender=Male" class="btn btn-secondary filter-btn">Male</a>
+            <a href="?category={{ selected_category }}&gender=Female" class="btn btn-secondary filter-btn">Female</a>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for image in images %}
+            <div class="col-md-3">
+                <div class="card product-card">
+                    <img src="{{ image.image_url }}" class="card-img-top" alt="Product Image">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ image.category }}</h5>
+                        <p class="card-text">Price: ${{ image.price }}</p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p>No products found.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+{% endblock %}
